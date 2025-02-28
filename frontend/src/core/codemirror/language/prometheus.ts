@@ -40,7 +40,7 @@ export class PrometheusLanguageAdapter implements LanguageAdapter {
       code.includes("_count") ||
       code.includes("_sum") ||
       code.includes("_bucket") ||
-      /\{[^}]*\}/.test(code) || // Label selectors {job="..."}
+      /{[^}]*}/.test(code) || // Label selectors {job="..."}
       code.includes("# Prometheus Query")
     );
   }

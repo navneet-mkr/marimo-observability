@@ -30,7 +30,7 @@ export class LokiLanguageAdapter implements LanguageAdapter {
   isSupported(code: string): boolean {
     // Simple heuristic - check if there are common LogQL patterns
     return (
-      /\{[^}]*\}/.test(code) || // Log stream selector {app="frontend"}
+      /{[^}]*}/.test(code) || // Log stream selector {app="frontend"}
       code.includes("|=") ||
       code.includes("!=") ||
       code.includes("|~") ||

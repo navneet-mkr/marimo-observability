@@ -56,6 +56,8 @@ import { SortableCellsProvider } from "@/components/sort/SortableCellsProvider";
 import { Column } from "../columns/cell-column";
 import type { CellColumnId, CollapsibleTree } from "@/utils/id-tree";
 import type { CellId } from "@/core/cells/ids";
+import { PrometheusLanguageAdapter } from "@/core/codemirror/language/prometheus";
+import { LokiLanguageAdapter } from "@/core/codemirror/language/loki";
 
 interface CellArrayProps {
   mode: AppMode;
@@ -291,8 +293,9 @@ const AddCellButtons: React.FC<{
           }
         >
           <SquareCodeIcon className="mr-2 size-4 flex-shrink-0" />
-          Python
+          Code
         </Button>
+
         <Button
           className={buttonClass}
           variant="text"
@@ -310,6 +313,45 @@ const AddCellButtons: React.FC<{
           <SquareMIcon className="mr-2 size-4 flex-shrink-0" />
           Markdown
         </Button>
+
+
+        <Tooltip
+          content={
+            sqlCapabilities ? null : (
+              <div className="flex flex-col">
+                <span>
+                  Additional dependencies required:
+                  <Kbd className="inline">pip install 'marimo[sql]'</Kbd>.
+                </span>
+                <span>
+                  You will need to restart the notebook after installing.
+                </span>
+              </div>
+            )
+          }
+          delayDuration={100}
+          asChild={false}
+        >
+          <Button
+            className={buttonClass}
+            variant="text"
+            size="sm"
+            disabled={!sqlCapabilities}
+            onClick={() => {
+              maybeAddMarimoImport(autoInstantiate, createNewCell);
+
+              createNewCell({
+                cellId: { type: "__end__", columnId },
+                before: false,
+                code: new SQLLanguageAdapter().defaultCode,
+              });
+            }}
+          >
+            <DatabaseIcon className="mr-2 size-4 flex-shrink-0" />
+            SQL
+          </Button>
+        </Tooltip>
+
         <Button
           className={buttonClass}
           variant="text"
@@ -320,23 +362,14 @@ const AddCellButtons: React.FC<{
             createNewCell({
               cellId: { type: "__end__", columnId },
               before: false,
-              code: `import marimo as mo
-from marimo._observability import promql
-
-# Execute and visualize a Prometheus query
-promql("""
-# @description: Metric Query
-# @start_time: -1h
-# @step: 15s
-
-# Your PromQL query here
-""")`
+              code: new PrometheusLanguageAdapter().defaultCode,
             });
           }}
         >
           <AreaChartIcon className="mr-2 size-4 flex-shrink-0" />
           PromQL
         </Button>
+
         <Button
           className={buttonClass}
           variant="text"
@@ -347,17 +380,7 @@ promql("""
             createNewCell({
               cellId: { type: "__end__", columnId },
               before: false,
-              code: `import marimo as mo
-from marimo._observability import logql
-
-# Query and display logs from Loki
-logql("""
-# @description: Log Query
-# @start_time: -1h
-# @limit: 100
-
-# Your LogQL query here
-""")`
+              code: new LokiLanguageAdapter().defaultCode,
             });
           }}
         >
@@ -389,42 +412,6 @@ grafana_dashboard("""
           <LayoutDashboardIcon className="mr-2 size-4 flex-shrink-0" />
           Grafana
         </Button>
-        <Tooltip
-          content={
-            sqlCapabilities ? null : (
-              <div className="flex flex-col">
-                <span>
-                  Additional dependencies required:
-                  <Kbd className="inline">pip install 'marimo[sql]'</Kbd>.
-                </span>
-                <span>
-                  You will need to restart the notebook after installing.
-                </span>
-              </div>
-            )
-          }
-          delayDuration={100}
-          asChild={false}
-        >
-          <Button
-            className={buttonClass}
-            variant="text"
-            size="sm"
-            disabled={!sqlCapabilities}
-            onClick={() => {
-              maybeAddMarimoImport(autoInstantiate, createNewCell);
-
-              createNewCell({
-                cellId: { type: "__end__", columnId },
-                before: false,
-                code: new SQLLanguageAdapter().getDefaultCode(),
-              });
-            }}
-          >
-            <DatabaseIcon className="mr-2 size-4 flex-shrink-0" />
-            SQL
-          </Button>
-        </Tooltip>
         <Tooltip
           content={
             aiEnabled ? null : <span>Enable via settings under AI Assist</span>
