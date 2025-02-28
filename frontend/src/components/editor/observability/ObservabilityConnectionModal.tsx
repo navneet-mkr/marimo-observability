@@ -1,16 +1,16 @@
 /* Copyright 2024 Marimo. All rights reserved. */
 import React from "react";
 import { Dialog } from "@/components/ui/dialog";
-import {
-  Form,
-  generateZodFormSchema,
-} from "@/components/forms/form-from-schema";
+import { ZodForm } from "@/components/forms/form";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { ObservabilityConnectionSchema } from "./schemas";
 import { generateObservabilityCode } from "./as-code";
-import { runCodeInCell } from "@/core/network/requests";
+import { sendRun } from "@/core/network/requests";
 import { toast } from "@/components/ui/use-toast";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { FormItem, FormControl, FormLabel } from "@/components/ui/form";
 
 interface Props {
   isOpen: boolean;
@@ -25,9 +25,14 @@ export const ObservabilityConnectionModal: React.FC<Props> = ({
 }) => {
   const [activeTab, setActiveTab] = React.useState<"prometheus" | "loki" | "grafana">("prometheus");
 
-  const schema = React.useMemo(() => {
-    return generateZodFormSchema(ObservabilityConnectionSchema);
-  }, []);
+  const form = useForm({
+    resolver: zodResolver(ObservabilityConnectionSchema),
+    defaultValues: { type: activeTab },
+  });
+
+  React.useEffect(() => {
+    form.setValue("type", activeTab);
+  }, [activeTab, form]);
 
   const handleConnectionSubmit = async (data: unknown) => {
     try {
@@ -35,10 +40,7 @@ export const ObservabilityConnectionModal: React.FC<Props> = ({
       const code = generateObservabilityCode(connection);
       
       if (cellId) {
-        await runCodeInCell({
-          cellId,
-          code,
-        });
+        await sendRun({ cellIds: [cellId], codes: [code] });
         
         onClose();
         toast({
@@ -46,12 +48,12 @@ export const ObservabilityConnectionModal: React.FC<Props> = ({
           description: `${connection.type.charAt(0).toUpperCase() + connection.type.slice(1)} connection code added to cell`,
         });
       }
-    } catch (error) {
-      console.error("Error adding connection:", error);
+    } catch {
+      // Log error silently
       toast({
         title: "Error adding connection",
         description: "Failed to add connection code",
-        variant: "destructive",
+        variant: "danger",
       });
     }
   };
@@ -99,30 +101,12 @@ export const ObservabilityConnectionModal: React.FC<Props> = ({
           </div>
           
           <div className="overflow-y-auto flex-1 p-6">
-            {activeTab === "prometheus" && (
-              <Form
-                schema={schema}
-                defaultValues={{ type: "prometheus" }}
-                onSubmit={handleConnectionSubmit}
-                submitLabel="Add"
-              />
-            )}
-            {activeTab === "loki" && (
-              <Form
-                schema={schema}
-                defaultValues={{ type: "loki" }}
-                onSubmit={handleConnectionSubmit}
-                submitLabel="Add"
-              />
-            )}
-            {activeTab === "grafana" && (
-              <Form
-                schema={schema}
-                defaultValues={{ type: "grafana" }}
-                onSubmit={handleConnectionSubmit}
-                submitLabel="Add"
-              />
-            )}
+            <form onSubmit={form.handleSubmit(handleConnectionSubmit)}>
+              <ZodForm schema={ObservabilityConnectionSchema} form={form} renderers={undefined} />
+              <div className="mt-6 flex justify-end">
+                <Button type="submit">Add</Button>
+              </div>
+            </form>
           </div>
         </div>
       </div>
