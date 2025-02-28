@@ -189,7 +189,7 @@ const DatabaseForm: React.FC<{
   );
 };
 
-const AddDatabaseForm: React.FC<Props> = ({ onSubmit }) => {
+export const AddDatabaseForm: React.FC<Props> = ({ onSubmit }) => {
   const [selectedSchema, setSelectedSchema] = useState<z.ZodType | null>(null);
 
   if (!selectedSchema) {

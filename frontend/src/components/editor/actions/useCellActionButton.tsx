@@ -26,6 +26,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   ScissorsIcon,
+  BarChart3Icon,
 } from "lucide-react";
 import type { ActionButton } from "./types";
 import { MultiIcon } from "@/components/icons/multi-icon";
@@ -56,6 +57,9 @@ import type { CellConfig, RuntimeState } from "@/core/network/types";
 import { kioskModeAtom } from "@/core/mode";
 import { switchLanguage } from "@/core/codemirror/language/extension";
 import { useSplitCellCallback } from "../cell/useSplitCell";
+import { useState } from "react";
+import { ObservabilityConnectionModal } from "../observability/ObservabilityConnectionModal";
+import { DatabaseConnectionModalContent } from "../database/DatabaseConnectionModal";
 
 export interface CellActionButtonProps
   extends Pick<CellData, "name" | "config"> {
@@ -93,6 +97,7 @@ export function useCellActionButtons({ cell }: Props) {
   const autoInstantiate = useAtomValue(autoInstantiateAtom);
   const kioskMode = useAtomValue(kioskModeAtom);
   const appWidth = useAtomValue(appWidthAtom);
+  const [showObservabilityModal, setShowObservabilityModal] = useState(false);
 
   if (!cell || kioskMode) {
     return [];
@@ -201,7 +206,9 @@ export function useCellActionButtons({ cell }: Props) {
         icon: <ScissorsIcon size={13} strokeWidth={1.5} />,
         label: "Split cell",
         hotkey: "cell.splitCell",
-        handle: () => splitCell({ cellId }),
+        handle: () => {
+          splitCell({ cellId: cellId });
+        },
       },
       {
         icon: <ImageIcon size={13} strokeWidth={1.5} />,
@@ -275,15 +282,46 @@ export function useCellActionButtons({ cell }: Props) {
       },
       {
         icon: <DatabaseIcon size={13} strokeWidth={1.5} />,
-        label: "Convert to SQL",
+        label: "Add database connection",
         handle: () => {
-          const editorView = getEditorView();
-          if (!editorView) {
-            return;
-          }
-          maybeAddMarimoImport(autoInstantiate, createCell);
-          switchLanguage(editorView, "sql", { keepCodeAsIs: true });
+          openModal(
+            <DialogContent className="max-w-3xl max-h-[90vh] p-0">
+              <div className="flex flex-col overflow-hidden">
+                <DialogHeader className="border-b px-4 py-3">
+                  <DialogTitle asChild={true}>
+                    <h3 className="text-lg">Add Database Connection</h3>
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="py-4">
+                  <div className="mb-4 px-4">
+                    <Label htmlFor="library">
+                      Connect to your database to query data directly from your
+                      canvas.
+                    </Label>
+                  </div>
+                  <DatabaseConnectionModalContent
+                    cellId={cellId}
+                    onComplete={() => openModal(null)}
+                  />
+                </div>
+              </div>
+            </DialogContent>
+          );
         },
+      },
+      {
+        icon: <BarChart3Icon size={13} strokeWidth={1.5} />,
+        label: "Add observability connection",
+        handle: () => {
+          setShowObservabilityModal(true);
+        },
+        rightElement: showObservabilityModal ? (
+          <ObservabilityConnectionModal
+            isOpen={showObservabilityModal}
+            onClose={() => setShowObservabilityModal(false)}
+            cellId={cellId}
+          />
+        ) : null,
       },
       {
         icon: <PythonIcon />,

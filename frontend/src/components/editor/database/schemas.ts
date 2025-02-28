@@ -178,7 +178,9 @@ export const DatabaseConnectionSchema = z.discriminatedUnion("type", [
   DuckDBConnectionSchema,
   SnowflakeConnectionSchema,
   BigQueryConnectionSchema,
-  PrometheusConnectionSchema,
 ]);
 
 export type DatabaseConnection = z.infer<typeof DatabaseConnectionSchema>;
+
+// This type is now moved to a separate observability module
+export type PrometheusConnection = z.infer<typeof PrometheusConnectionSchema>;

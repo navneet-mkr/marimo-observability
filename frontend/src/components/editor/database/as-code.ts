@@ -95,29 +95,6 @@ engine = create_engine("duckdb:${connection.database || ":memory:"}"${connection
 `;
       break;
 
-    case "prometheus":
-      imports.length = 0; // Clear existing imports
-      imports.push(
-        "from prometheus_api_client import PrometheusConnect",
-        "import os"
-      );
-
-      if (connection.username && connection.password) {
-        code = `
-username = "${connection.username}"
-password = os.environ.get("PROMETHEUS_PASSWORD", "${connection.password}")
-prom = PrometheusConnect(
-    url="${connection.url}",
-    headers={"Authorization": f"Basic {username}:{password}"}
-)
-`;
-      } else {
-        code = `
-prom = PrometheusConnect(url="${connection.url}")
-`;
-      }
-      break;
-
     default:
       assertNever(connection);
   }
