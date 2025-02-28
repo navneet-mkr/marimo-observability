@@ -12,6 +12,7 @@ import {
   DuckDBConnectionSchema,
   SnowflakeConnectionSchema,
   BigQueryConnectionSchema,
+  PrometheusConnectionSchema,
   type DatabaseConnection,
 } from "./schemas";
 import {
@@ -91,6 +92,12 @@ const SCHEMAS = [
     schema: BigQueryConnectionSchema,
     color: "#4285F4",
     logo: "bigquery",
+  },
+  {
+    name: "Prometheus",
+    schema: PrometheusConnectionSchema,
+    color: "#E6522C",
+    logo: "prometheus",
   },
 ] satisfies Array<{
   name: string;

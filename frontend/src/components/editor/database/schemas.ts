@@ -148,6 +148,29 @@ export const BigQueryConnectionSchema = z
   })
   .describe(FieldOptions.of({ direction: "two-columns" }));
 
+export const PrometheusConnectionSchema = z
+  .object({
+    type: z.literal("prometheus"),
+    url: z
+      .string()
+      .nonempty()
+      .default("http://localhost:9090")
+      .describe(
+        FieldOptions.of({ 
+          label: "URL", 
+          placeholder: "http://localhost:9090" 
+        })
+      ),
+    username: z
+      .string()
+      .optional()
+      .describe(FieldOptions.of({ label: "Username (optional)" })),
+    password: passwordField().describe(
+      FieldOptions.of({ label: "Password (optional)" })
+    ),
+  })
+  .describe(FieldOptions.of({ direction: "two-columns" }));
+
 export const DatabaseConnectionSchema = z.discriminatedUnion("type", [
   PostgresConnectionSchema,
   MySQLConnectionSchema,
@@ -155,6 +178,7 @@ export const DatabaseConnectionSchema = z.discriminatedUnion("type", [
   DuckDBConnectionSchema,
   SnowflakeConnectionSchema,
   BigQueryConnectionSchema,
+  PrometheusConnectionSchema,
 ]);
 
 export type DatabaseConnection = z.infer<typeof DatabaseConnectionSchema>;

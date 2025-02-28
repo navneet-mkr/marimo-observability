@@ -46,6 +46,8 @@ export function dbDisplayName(name: string) {
       return "Apache Cassandra";
     case "mongodb":
       return "MongoDB";
+    case "prometheus":
+      return "Prometheus";
     default:
       return name;
   }

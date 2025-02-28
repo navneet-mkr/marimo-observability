@@ -56,7 +56,7 @@ export const PANELS: PanelDescriptor[] = [
   {
     type: "datasources",
     Icon: DatabaseIcon,
-    tooltip: "Explore data sources",
+    tooltip: "Data Sources",
     position: "sidebar",
   },
   {
