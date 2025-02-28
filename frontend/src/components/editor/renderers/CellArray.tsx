@@ -31,6 +31,9 @@ import {
   SparklesIcon,
   SquareCodeIcon,
   SquareMIcon,
+  AreaChartIcon,
+  ListIcon,
+  LayoutDashboardIcon,
 } from "lucide-react";
 import { maybeAddMarimoImport } from "@/core/cells/add-missing-import";
 import { aiEnabledAtom, autoInstantiateAtom } from "@/core/config/config";
@@ -306,6 +309,85 @@ const AddCellButtons: React.FC<{
         >
           <SquareMIcon className="mr-2 size-4 flex-shrink-0" />
           Markdown
+        </Button>
+        <Button
+          className={buttonClass}
+          variant="text"
+          size="sm"
+          onClick={() => {
+            maybeAddMarimoImport(autoInstantiate, createNewCell);
+
+            createNewCell({
+              cellId: { type: "__end__", columnId },
+              before: false,
+              code: `import marimo as mo
+from marimo._observability import promql
+
+# Execute and visualize a Prometheus query
+promql("""
+# @description: Metric Query
+# @start_time: -1h
+# @step: 15s
+
+# Your PromQL query here
+""")`
+            });
+          }}
+        >
+          <AreaChartIcon className="mr-2 size-4 flex-shrink-0" />
+          PromQL
+        </Button>
+        <Button
+          className={buttonClass}
+          variant="text"
+          size="sm"
+          onClick={() => {
+            maybeAddMarimoImport(autoInstantiate, createNewCell);
+
+            createNewCell({
+              cellId: { type: "__end__", columnId },
+              before: false,
+              code: `import marimo as mo
+from marimo._observability import logql
+
+# Query and display logs from Loki
+logql("""
+# @description: Log Query
+# @start_time: -1h
+# @limit: 100
+
+# Your LogQL query here
+""")`
+            });
+          }}
+        >
+          <ListIcon className="mr-2 size-4 flex-shrink-0" />
+          LogQL
+        </Button>
+        <Button
+          className={buttonClass}
+          variant="text"
+          size="sm"
+          onClick={() => {
+            maybeAddMarimoImport(autoInstantiate, createNewCell);
+
+            createNewCell({
+              cellId: { type: "__end__", columnId },
+              before: false,
+              code: `import marimo as mo
+from marimo._observability import grafana_dashboard
+
+# Embed a Grafana dashboard
+grafana_dashboard("""
+# @dashboard: your-dashboard-uid
+# @from: now-6h
+# @to: now
+""")`
+            });
+          }}
+        >
+          <LayoutDashboardIcon className="mr-2 size-4 flex-shrink-0" />
+          Grafana
         </Button>
         <Tooltip
           content={

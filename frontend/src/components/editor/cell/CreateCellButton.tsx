@@ -9,8 +9,11 @@ import {
   ContextMenuItem,
 } from "@/components/ui/context-menu";
 import { MarkdownLanguageAdapter } from "@/core/codemirror/language/markdown";
-import { MarkdownIcon, PythonIcon } from "./code/icons";
+import { MarkdownIcon, PythonIcon, PrometheusIcon, LokiIcon, GrafanaIcon } from "./code/icons";
 import { SQLLanguageAdapter } from "@/core/codemirror/language/sql";
+import { PrometheusLanguageAdapter } from "@/core/codemirror/language/prometheus";
+import { LokiLanguageAdapter } from "@/core/codemirror/language/loki";
+import { GrafanaLanguageAdapter } from "@/core/codemirror/language/grafana";
 import { cn } from "@/utils/cn";
 import { Events } from "@/utils/events";
 
@@ -95,6 +98,42 @@ const CreateCellButtonContextMenu = (props: {
             <DatabaseIcon size={13} strokeWidth={1.5} />
           </div>
           SQL cell
+        </ContextMenuItem>
+        <ContextMenuItem
+          key="prometheus"
+          onSelect={(evt) => {
+            evt.stopPropagation();
+            onClick({ code: new PrometheusLanguageAdapter().defaultCode });
+          }}
+        >
+          <div className="mr-3 text-muted-foreground">
+            <PrometheusIcon />
+          </div>
+          Prometheus (PromQL) cell
+        </ContextMenuItem>
+        <ContextMenuItem
+          key="loki"
+          onSelect={(evt) => {
+            evt.stopPropagation();
+            onClick({ code: new LokiLanguageAdapter().defaultCode });
+          }}
+        >
+          <div className="mr-3 text-muted-foreground">
+            <LokiIcon />
+          </div>
+          Loki (LogQL) cell
+        </ContextMenuItem>
+        <ContextMenuItem
+          key="grafana"
+          onSelect={(evt) => {
+            evt.stopPropagation();
+            onClick({ code: new GrafanaLanguageAdapter().defaultCode });
+          }}
+        >
+          <div className="mr-3 text-muted-foreground">
+            <GrafanaIcon />
+          </div>
+          Grafana Dashboard cell
         </ContextMenuItem>
       </ContextMenuContent>
     </ContextMenu>
